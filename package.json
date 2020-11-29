@@ -1,0 +1,26 @@
+{
+  "name": "fake-luogu-paintboard-server",
+  "version": "0.1.0",
+  "description": "模拟洛谷冬日绘版服务器，可用于测试脚本",
+  "main": "index.js",
+  "bin": "index.js",
+  "repository": "https://github.com/ouuan/fake-luogu-paintboard-server",
+  "author": "Yufan You <ouuansteve@gmail.com>",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "start": "node index.js",
+    "lint": "eslint index.js --fix"
+  },
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "lodash": "^4.17.20",
+    "neodoc": "^2.0.2",
+    "server": "^1.0.31"
+  },
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
