@@ -1,6 +1,6 @@
 # fake-luogu-paintboard-server
 
-模拟[洛谷冬日绘版](https://www.luogu.com.cn/paintBoard)服务器，可用于测试脚本。
+模拟[洛谷冬日绘板](https://www.luogu.com.cn/paintBoard)服务器，可用于测试脚本。
 
 [![npm](https://img.shields.io/npm/v/fake-luogu-paintboard-server)](https://www.npmjs.com/package/fake-luogu-paintboard-server)
 
@@ -34,11 +34,11 @@ yarn start --help
 
 ### `GET(/)`
 
-返回包含当前绘版图片的 HTML。（即你可以在 `localhost:<port>/` 查看当前绘版的可视化图像。）
+返回包含当前绘板图片的 HTML。（即你可以在 `localhost:<port>/` 查看当前绘板的可视化图像。）
 
 ### `GET(/board)`
 
-返回一个包含 `WIDTH` 行的字符串，其中第 `i` 行包含 `HEIGHT` 个字符，其中的第 `j` 个字符是绘版上第 `i + 1` 列第 `j + 1` 行的颜色的编号的 32 进制（10-31 用小写字母 a-v 表示）。
+返回一个包含 `WIDTH` 行的字符串，其中第 `i` 行包含 `HEIGHT` 个字符，其中的第 `j` 个字符是绘板上第 `i + 1` 列第 `j + 1` 行的颜色的编号的 32 进制（10-31 用小写字母 a-v 表示）。
 
 ### `POST(/paint)`
 
