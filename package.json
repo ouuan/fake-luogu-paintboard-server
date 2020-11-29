@@ -1,8 +1,7 @@
 {
   "name": "fake-luogu-paintboard-server",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "模拟洛谷冬日绘版服务器，可用于测试脚本",
-  "main": "index.js",
   "bin": "index.js",
   "repository": "https://github.com/ouuan/fake-luogu-paintboard-server",
   "author": "Yufan You <ouuansteve@gmail.com>",
