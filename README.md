@@ -2,6 +2,30 @@
 
 模拟洛谷冬日绘版服务器，可用于测试脚本。
 
+## 安装/运行
+
+### NPM
+
+```sh
+npm install -g fake-luogu-paintboard-server
+```
+
+```sh
+fake-luogu-paintboard-server --help
+```
+
+### 手动安装
+
+```sh
+git clone https://github.com/ouuan/fake-luogu-paintboard-server
+cd fake-luogu-paintboard-server
+yarn
+```
+
+```sh
+yarn start --help
+```
+
 ## API
 
 由于洛谷冬日绘板活动已经结束（还未开始），部分 API 的具体返回值和提示信息难以考证，可能稍微有些不准确。
