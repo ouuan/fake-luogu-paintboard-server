@@ -2,6 +2,8 @@
 
 模拟洛谷冬日绘版服务器，可用于测试脚本。
 
+[![npm](https://img.shields.io/npm/v/fake-luogu-paintboard-server)](https://www.npmjs.com/package/fake-luogu-paintboard-server)
+
 ## 安装/运行
 
 ### NPM
