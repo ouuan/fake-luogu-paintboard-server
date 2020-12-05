@@ -161,7 +161,7 @@ function paint(ctx) {
     return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
   }
 
-  return response(412, 'data 中的 x, y, color 不合法');
+  return response(400, 'data 中的 x, y, color 不合法');
 }
 
 server({ port, security: { csrf: false }, log: verbose ? 'info' : 'warning' }, [
