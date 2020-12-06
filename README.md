@@ -30,17 +30,17 @@ yarn start --help
 
 ## HTTP API
 
-由于洛谷冬日绘板活动已经结束（还未开始），部分 API 的具体返回值和提示信息难以考证，可能稍微有些不准确。
+URL: `http://localhost:<port>`
 
-### `GET(http://localhost:<port>/paintBoard)`
+### `GET(/paintBoard)`
 
 返回 [洛谷冬日绘板主页](https://www.luogu.com.cn/paintBoard) 的 HTML。
 
-### `GET(http://localhost:<port>/paintBoard/board)`
+### `GET(/paintBoard/board)`
 
 返回一个包含 `WIDTH` 行的字符串，其中第 `i` 行包含 `HEIGHT` 个字符，其中的第 `j` 个字符是绘板上第 `i + 1` 列第 `j + 1` 行的颜色的编号的 32 进制（10-31 用小写字母 a-v 表示）。
 
-### `POST(http://localhost:<port>/paintBoard/paint)`
+### `POST(/paintBoard/paint)`
 
 要求：
 
@@ -49,6 +49,8 @@ yarn start --help
 3.  data 为：`{x:<columnIndex>,y:<rowIndex>,color:<colorIndex>}`，表示在第 `x + 1` 列第 `y + 1` 行的像素画编号为 `color` 的颜色。
 
 ## WebSocket API
+
+URL: `ws://localhost:<wsport>/ws`
 
 ### `send({"type":"join_channel","channel":"paintboard"})`
 
