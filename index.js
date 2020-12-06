@@ -17,11 +17,14 @@
 * limitations under the License.
 */
 
+const fs = require('fs');
 const _ = require('lodash');
+const path = require('path');
+const WebSocket = require('ws');
 const neodoc = require('neodoc');
 const server = require('server');
+const json = require('server/reply/json');
 const status = require('server/reply/status');
-const { createCanvas, createImageData } = require('canvas');
 
 const { version: VERSION } = require('./package.json');
 
@@ -33,8 +36,11 @@ Usage:
   fake-luogu-paintboard-server [options]
   
 Options:
-  --port=<port>      The port of the server on the localhost.
+  --port=<port>      The port of the HTTP server on localhost.
                      [env: PORT] [default: 3000]
+  
+  --wsport=<wsport>  The port of the WebSocket server on localhost.
+                     [env: WSPORT] [default: 4000]
                      
   --cd=<cd>          Inteval between two paints of the same uid, in milliseconds.
                      [env: CD] [default: 10000]
@@ -48,6 +54,7 @@ Options:
 
 const {
   '--port': port,
+  '--wsport': wsport,
   '--cd': cd,
   '--width': width,
   '--height': height,
@@ -95,27 +102,25 @@ const REQUIRED_REFERER = 'https://www.luogu.com.cn/paintBoard';
 const board = new Array(width).fill(0).map(() => new Array(height).fill(DEFAULT_COLOR));
 const lastPaint = new Map();
 
-function visualize() {
-  const imageData = createImageData(width, height);
-  board.forEach((column, columnIndex) => {
-    column.forEach((cell, rowIndex) => {
-      const index = 4 * (rowIndex * width + columnIndex);
-      for (let i = 0; i < 3; i += 1) {
-        imageData.data[index + i] = COLOR[cell][i];
-      }
-      imageData.data[index + 3] = 255;
-    });
+const wsUrl = `ws://localhost:${wsport}`;
+
+let homePage = 'Loading...';
+
+fs.readFile(path.resolve(__dirname, 'paintBoard.html'), (err, data) => {
+  if (err) throw err;
+  homePage = data.toString().replace('$wsurl', wsUrl);
+});
+
+const wss = new WebSocket.Server({ port: wsport, path: '/ws' });
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    const msg = JSON.parse(message);
+    if (msg.type === 'join_channel' && msg.channel === 'paintboard') {
+      ws.send(JSON.stringify({ type: 'result' }));
+    }
   });
-  const canvas = createCanvas(width, height);
-  canvas.getContext('2d').putImageData(imageData, 0, 0);
-  const dataUrl = canvas.toDataURL('image/png');
-  return `<head>
-  <title>fake-luogu-paintboard-server</title>
-</head>
-<body>
-  <img src=${dataUrl} style="border: 4px dotted black;"/>
-</body>`;
-}
+});
 
 function getBoard() {
   let result = '';
@@ -131,7 +136,7 @@ function getBoard() {
 function paint(ctx) {
   function response(statusCode, message) {
     ctx.log.info(`${statusCode}: ${message}`);
-    return status(statusCode).json({ status: statusCode, data: message });
+    return json({ status: statusCode, data: message });
   }
 
   const uid = ctx.cookies?._uid;
@@ -153,23 +158,36 @@ function paint(ctx) {
   const y = +ctx.data?.y;
   const color = +ctx.data?.color;
 
-  if (_.inRange(x, 0, width)
-   && _.inRange(y, 0, height)
-   && _.inRange(color, 0, COLOR.length)) {
-    lastPaint.set(uid, Date.now());
-    board[x][y] = color;
-    return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
+  if (_.inRange(x, 0, width) && _.inRange(y, 0, height) && _.inRange(color, 0, COLOR.length)) {
+    try {
+      lastPaint.set(uid, Date.now());
+      board[x][y] = color;
+      return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
+    } finally {
+      const broadcast = JSON.stringify({
+        type: 'paintboard_update',
+        x,
+        y,
+        color,
+      });
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(broadcast);
+        }
+      });
+    }
   }
 
   return response(400, 'data 中的 x, y, color 不合法');
 }
 
 server({ port, security: { csrf: false }, log: verbose ? 'info' : 'warning' }, [
-  get('/', visualize),
-  get('/board', getBoard),
-  post('/paint', paint),
+  get('/paintBoard', () => homePage),
+  get('/paintBoard/board', getBoard),
+  post('/paintBoard/paint', paint),
   get(() => status(404).send('Not Found')),
 ]).then(() => {
   // eslint-disable-next-line no-console
-  console.log(`Listening on http://localhost:${port}`);
+  console.log(`Homepage: http://localhost:${port}/paintBoard
+WebSocket: ${wsUrl}/ws`);
 });

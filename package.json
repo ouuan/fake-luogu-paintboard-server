@@ -12,10 +12,10 @@
     "lint": "eslint index.js --fix"
   },
   "dependencies": {
-    "canvas": "^2.6.1",
     "lodash": "^4.17.20",
     "neodoc": "^2.0.2",
-    "server": "^1.0.31"
+    "server": "^1.0.31",
+    "ws": "^7.4.1"
   },
   "devDependencies": {
     "eslint": "^7.14.0",

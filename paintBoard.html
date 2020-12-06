@@ -1,0 +1,319 @@
+<!doctype html>
+<html class="no-js">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
+    <title>Fake Luogu Paintboard Server</title>
+    <link rel="stylesheet" href="https://cdn.luogu.com.cn/css/amazeui.min.css">
+    <style>
+        .about {
+            background: #fff;
+            padding: 40px 0;
+            color: #7f8c8d;
+        }
+
+        .about-color {
+            color: #34495e;
+        }
+
+        .about-title {
+            font-size: 180%;
+            padding: 30px 0 50px 0;
+            text-align: center;
+        }
+
+        .footer p {
+            color: #7f8c8d;
+            margin: 0;
+            padding: 15px 0;
+            text-align: center;
+            background: #2d3e50;
+        }
+
+        .paleitem {
+            margin: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            background: #66ccff;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        #palette {
+            padding: 10px;
+            background: #7f7f7f;
+            margin: 10px;
+            width: 500px;
+            color: #fff;
+        }
+
+        .selected {
+            border: #DAA520 3px solid;
+        }
+
+        #canvas-box {
+            width: 830px;
+            height: 430px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="am-topbar am-topbar-fixed-top">
+        <div class="am-container">
+            <h1 class="am-topbar-brand">
+                <a href="#">洛谷冬日绘板</a>
+            </h1>
+            <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-secondary am-show-sm-only"
+                data-am-collapse="{target: '#collapse-head'}"><span class="am-sr-only">导航切换</span> <span
+                    class="am-icon-bars"></span></button>
+            <div class="am-collapse am-topbar-collapse" id="collapse-head">
+                <ul class="am-nav am-nav-pills am-topbar-nav">
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div class="about">
+        <div class="am-g am-container">
+            <div class="am-u-lg-12">
+                <h2 class="about-title about-color">洛谷 冬日绘板</h2>
+                <div class="am-g">
+                    <div class="am-u-lg-11" id="canvas-box">
+                        <canvas width=4000 height=2000 id='mycanvas'>
+                        </canvas>
+                    </div>
+                    <div class="am-u-lg-1">
+                        <p style>
+                            还剩<br><span id='timeleft' class="am-badge am-badge-secondary"></span>
+                        </p>
+                    </div>
+                    <div class="am-u-lg-12" id='palette'>Loading...</div>
+                    <div class="am-u-lg-12" id='zoom-tool'>
+                        <button type="button" class="am-btn am-btn-primary am-radius" zoom=1>全部显示</button>
+                        <button type="button" class="am-btn am-btn-secondary am-radius" zoom=5>放大5x</button>
+                        <button type="button" class="am-btn am-btn-success am-radius" zoom=10>放大10x</button>
+                    </div>
+                    <div class="am-u-lg-12">
+                        <p>本页面来源于<a href="https://www.luogu.com.cn/paintBoard" target="_blank">官方绘板页面</a>。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--[if (gte IE 9)|!(IE)]><!-->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <!--<![endif]-->
+    <!--[if lte IE 8 ]>
+<script src="https://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
+<script src="assets/js/amazeui.ie8polyfill.min.js"></script>
+<![endif]-->
+    <script>
+        H = 400;
+        W = 800;
+        nowcolor = 0;
+        scale = 5;
+        dragged = 0;
+        lasttime = 0;
+        timelimit = 10;
+        colorlist = ['rgb(0, 0, 0)', 'rgb(255, 255, 255)', 'rgb(170, 170, 170)', 'rgb(85, 85, 85)', 'rgb(254, 211, 199)', 'rgb(255, 196, 206)', 'rgb(250, 172, 142)', 'rgb(255, 139, 131)', 'rgb(244, 67, 54)', 'rgb(233, 30, 99)', 'rgb(226, 102, 158)', 'rgb(156, 39, 176)', 'rgb(103, 58, 183)', 'rgb(63, 81, 181)', 'rgb(0, 70, 112)', 'rgb(5, 113, 151)', 'rgb(33, 150, 243)', 'rgb(0, 188, 212)', 'rgb(59, 229, 219)', 'rgb(151, 253, 220)', 'rgb(22, 115, 0)', 'rgb(55, 169, 60)', 'rgb(137, 230, 66)', 'rgb(215, 255, 7)', 'rgb(255, 246, 209)', 'rgb(248, 203, 140)', 'rgb(255, 235, 59)', 'rgb(255, 193, 7)', 'rgb(255, 152, 0)', 'rgb(255, 87, 34)', 'rgb(184, 63, 39)', 'rgb(121, 85, 72)'];
+        nowintevel = 0;
+        var myarr = [];
+        for (var i = 0; i < H; i++) {
+            myarr[i] = [];
+            for (var j = 0; j < W; j++) {
+                myarr[i][j] = '#dddddd';
+            }
+        }
+
+        function render(arr) {
+            var c = document.getElementById("mycanvas");
+            var ctx = c.getContext("2d");
+            for (var i = 0; i < H; i++) {
+                for (var j = 0; j < W; j++) {
+                    ctx.fillStyle = arr[i][j];
+                    ctx.fillRect(j * scale, i * scale, scale, scale);
+                }
+            }
+
+        }
+
+        function update(y, x, color) {
+            if (dragged) {
+                dragged = 0;
+                return;
+            }
+            //alert('ss');
+            var c = document.getElementById("mycanvas");
+            var ctx = c.getContext("2d");
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.fillRect(x * 5, y * 5, 5, 5);
+        }
+
+        function initpale() {
+            $('#palette').html('');
+            colorlist.forEach(function (k, v) {
+                console.log(k, v);
+                $('#palette').append('<div class="paleitem" data-cid=' + v + '></div>');
+                $('[data-cid=' + v + ']').css('background', k);
+            });
+            zoom(1)
+        }
+
+        binditem = function () {
+            $('.paleitem').removeClass("selected");
+            $(this).addClass("selected");
+            nowcolor = $(this).attr('data-cid');
+        }
+        zoom = function (s) {
+            scale = s;
+            $('#mycanvas').width(800 * scale)
+            if (s == 1) {
+                $('#mycanvas').css('top', 0);
+                $('#mycanvas').css('left', 0);
+            }
+        }
+        $("[zoom]").click(function () {
+            zoom($(this).attr('zoom'));
+        });
+        myarr[10][10] = '#6600ff';
+        myarr[100][200] = '#66ccff';
+        render(myarr);
+        initpale();
+        $('.paleitem').bind("click", binditem);
+        $('[data-cid=0]').addClass("selected");
+        $('#mycanvas').bind("click", function () {
+            //alert(event.offsetY);
+            if (new Date() < (lasttime + timelimit) * 1000) {
+                alert("冷却时间未到，暂时不能涂色");
+                return;
+            }
+            var x = parseInt(event.offsetX / scale);
+            var y = parseInt(event.offsetY / scale);
+            update(
+                y,
+                x,
+                colorlist[nowcolor]
+            );
+            $.post("/paintBoard/paint", {
+                x: x,
+                y: y,
+                color: nowcolor
+            }, function (resp) {
+                if (resp.status !== 200) {
+                    alert(resp.data)
+                } else {
+                    lasttime = (new Date()) / 1000;
+                    getCountDown(lasttime + timelimit);
+                }
+            });
+        })
+        $('#mycanvas').draggable({
+            cursor: "move",
+            stop: function () {
+                dragged = 1;
+            }
+        });
+        $('#mycanvas').bind("mousewheel", function (event, delta) {
+            var delta = event.originalEvent.deltaY;
+            var y = parseInt(event.offsetY / scale);
+            var x = parseInt(event.offsetX / scale);
+            console.log(event);
+            if (delta > 0) {
+                if (scale == 10)
+                    zoom(5);
+                else if (scale == 5)
+                    zoom(1);
+            } else {
+                if (scale == 1)
+                    zoom(5);
+                else if (scale == 5)
+                    zoom(10);
+            }
+            if (scale != 1) {
+                $('#mycanvas').css('top', -y * scale + 200);
+                $('#mycanvas').css('left', -x * scale + 400);
+            }
+            scale
+            return false;
+        });
+
+        function getCountDown(timestamp) {
+            clearInterval(nowintevel);
+            nowintevel = setInterval(function () {
+                var nowTime = new Date();
+                var endTime = new Date(timestamp * 1000);
+                var t = endTime.getTime() - nowTime.getTime();
+                if (t < 0) {
+                    $("#timeleft").html("冷却时间到");
+                    clearInterval(nowintevel);
+                    return;
+                }
+                var hour = Math.floor(t / 1000 / 60 / 60 % 24);
+                var min = Math.floor(t / 1000 / 60 % 60);
+                var sec = Math.floor(t / 1000 % 60);
+                if (hour < 10)
+                    hour = "0" + hour;
+                if (min < 10)
+                    min = "0" + min;
+                if (sec < 10)
+                    sec = "0" + sec;
+                var countDownTime = hour + ":" + min + ":" + sec;
+                $("#timeleft").html(countDownTime);
+            }, 1000);
+        }
+
+        getCountDown(lasttime + timelimit);
+
+        function initialPaint() {
+            $.get("/paintBoard/board", function (resp) {
+                resp.split('\n').map(function (colorStr, x) {
+                    colorStr.split("").map(function (color, y) {
+                        //if(color !== '2') console.log(x, y, color);
+                        update(y, x, colorlist[parseInt(color, 32)]);
+                    });
+                });
+            });
+        }
+
+        var ws = null;
+        function connectWs() {
+            try {
+                ws = new WebSocket('$wsurl/ws');
+            } catch (e) {
+                alert("无法连接追踪服务器");
+                return;
+            }
+
+            ws.onopen = function () {
+                var message = {
+                    "type": "join_channel",
+                    "channel": "paintboard",
+                    "channel_param": ""
+                };
+                ws.send(JSON.stringify(message));
+            };
+
+            ws.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+                if (data.type === "paintboard_update") {
+                    update(data.y, data.x, colorlist[data.color]);
+                } else if (data.type === "result") {
+                    initialPaint()
+                }
+            };
+        }
+
+        connectWs();
+    </script>
+</body>
+
+</html>
