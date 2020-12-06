@@ -41,7 +41,10 @@ Options:
   
   --wsport=<wsport>  The port of the WebSocket server on localhost.
                      [env: WSPORT] [default: 4000]
-                     
+
+  --noRestrict       Don't require cookies and referer and no CD time.
+                     [env: NORESTRICT]
+
   --cd=<cd>          Inteval between two paints of the same uid, in milliseconds.
                      [env: CD] [default: 10000]
 
@@ -55,6 +58,7 @@ Options:
 const {
   '--port': port,
   '--wsport': wsport,
+  '--noRestrict': noRestrict,
   '--cd': cd,
   '--width': width,
   '--height': height,
@@ -141,17 +145,20 @@ function paint(ctx) {
 
   const uid = ctx.cookies?._uid;
   const clientId = ctx.cookies?.__client_id;
-  if (!uid || !clientId) {
-    return response(401, '没有登录（你需要在 Cookies 中包含 "_uid" 和 "__client_id"）');
-  }
 
-  const referer = ctx.headers?.referer;
-  if (referer !== REQUIRED_REFERER) {
-    return response(412, `Referer 应为 "${REQUIRED_REFERER}"`);
-  }
+  if (!noRestrict) {
+    if (!uid || !clientId) {
+      return response(401, '没有登录（你需要在 Cookies 中包含 "_uid" 和 "__client_id"）');
+    }
 
-  if (lastPaint.has(uid) && Date.now() - lastPaint.get(uid) < cd) {
-    return response(500, `uid:${uid} 冷却中`);
+    const referer = ctx.headers?.referer;
+    if (referer !== REQUIRED_REFERER) {
+      return response(412, `Referer 应为 "${REQUIRED_REFERER}"`);
+    }
+
+    if (lastPaint.has(uid) && Date.now() - lastPaint.get(uid) < cd) {
+      return response(500, `uid:${uid} 冷却中`);
+    }
   }
 
   const x = +ctx.data?.x;
