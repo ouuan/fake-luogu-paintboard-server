@@ -75,10 +75,8 @@ async function createServer({
   const board = new Array(width).fill(0).map(() => new Array(height).fill(DEFAULT_COLOR));
   const lastPaint = new Map();
 
-  const homePage = await fs.readFile(path.resolve(__dirname, 'paintBoard.html')).then((err, data) => {
-    if (err) throw err;
-    return data.toString().replace('$wsurl', `ws://localhost:${wsport}`);
-  });
+  const homePage = await fs.readFile(path.resolve(__dirname, 'paintBoard.html'))
+    .then((data) => data.toString().replace('$wsurl', `ws://localhost:${wsport}`));
 
   const wss = await new Promise((resolve, reject) => {
     const wsServer = new WebSocket.Server({ port: wsport, path: '/ws' });
@@ -92,7 +90,7 @@ async function createServer({
       });
     });
 
-    wsServer.on('open', () => resolve(wsServer));
+    wsServer.on('listening', () => resolve(wsServer));
 
     wsServer.on('error', (error) => reject(error));
   });
