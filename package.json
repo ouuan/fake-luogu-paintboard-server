@@ -1,6 +1,6 @@
 {
   "name": "fake-luogu-paintboard-server",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "模拟洛谷冬日绘板服务器，可用于测试脚本",
   "main": "lib.js",
   "bin": "cmd.js",
