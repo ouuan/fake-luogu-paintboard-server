@@ -59,8 +59,8 @@ const {
 
 createServer({
   port, wsport, noRestrict, cd, width, height, verbose,
-}).then(() => {
+}).then(({ homePageUrl, wsUrl }) => {
   // eslint-disable-next-line no-console
-  console.log(`Homepage: http://localhost:${port}/paintBoard
-  WebSocket: ws://localhost:${wsport}/ws`);
+  console.log(`Homepage: ${homePageUrl}
+WebSocket: ${wsUrl}`);
 });

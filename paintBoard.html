@@ -85,7 +85,7 @@
                 <h2 class="about-title about-color">洛谷 冬日绘板</h2>
                 <div class="am-g">
                     <div class="am-u-lg-11" id="canvas-box">
-                        <canvas width=4000 height=2000 id='mycanvas'>
+                        <canvas width=$5width height=$5height id='mycanvas'>
                         </canvas>
                     </div>
                     <div class="am-u-lg-1">
@@ -116,13 +116,13 @@
 <script src="assets/js/amazeui.ie8polyfill.min.js"></script>
 <![endif]-->
     <script>
-        H = 400;
-        W = 800;
+        H = $height;
+        W = $width;
         nowcolor = 0;
         scale = 5;
         dragged = 0;
         lasttime = 0;
-        timelimit = 10;
+        timelimit = $cd / 1000;
         colorlist = ['rgb(0, 0, 0)', 'rgb(255, 255, 255)', 'rgb(170, 170, 170)', 'rgb(85, 85, 85)', 'rgb(254, 211, 199)', 'rgb(255, 196, 206)', 'rgb(250, 172, 142)', 'rgb(255, 139, 131)', 'rgb(244, 67, 54)', 'rgb(233, 30, 99)', 'rgb(226, 102, 158)', 'rgb(156, 39, 176)', 'rgb(103, 58, 183)', 'rgb(63, 81, 181)', 'rgb(0, 70, 112)', 'rgb(5, 113, 151)', 'rgb(33, 150, 243)', 'rgb(0, 188, 212)', 'rgb(59, 229, 219)', 'rgb(151, 253, 220)', 'rgb(22, 115, 0)', 'rgb(55, 169, 60)', 'rgb(137, 230, 66)', 'rgb(215, 255, 7)', 'rgb(255, 246, 209)', 'rgb(248, 203, 140)', 'rgb(255, 235, 59)', 'rgb(255, 193, 7)', 'rgb(255, 152, 0)', 'rgb(255, 87, 34)', 'rgb(184, 63, 39)', 'rgb(121, 85, 72)'];
         nowintevel = 0;
         var myarr = [];
@@ -175,7 +175,7 @@
         }
         zoom = function (s) {
             scale = s;
-            $('#mycanvas').width(800 * scale)
+            $('#mycanvas').width(W * scale)
             if (s == 1) {
                 $('#mycanvas').css('top', 0);
                 $('#mycanvas').css('left', 0);
@@ -184,8 +184,8 @@
         $("[zoom]").click(function () {
             zoom($(this).attr('zoom'));
         });
-        myarr[10][10] = '#6600ff';
-        myarr[100][200] = '#66ccff';
+        // myarr[10][10] = '#6600ff';
+        // myarr[100][200] = '#66ccff';
         render(myarr);
         initpale();
         $('.paleitem').bind("click", binditem);
@@ -239,8 +239,8 @@
                     zoom(10);
             }
             if (scale != 1) {
-                $('#mycanvas').css('top', -y * scale + 200);
-                $('#mycanvas').css('left', -x * scale + 400);
+                $('#mycanvas').css('top', -y * scale + H / 2);
+                $('#mycanvas').css('left', -x * scale + W / 2);
             }
             scale
             return false;
@@ -287,7 +287,7 @@
         var ws = null;
         function connectWs() {
             try {
-                ws = new WebSocket('$wsurl/ws');
+                ws = new WebSocket('$wsUrl');
             } catch (e) {
                 alert("无法连接追踪服务器");
                 return;

@@ -75,8 +75,16 @@ async function createServer({
   const board = new Array(width).fill(0).map(() => new Array(height).fill(DEFAULT_COLOR));
   const lastPaint = new Map();
 
+  const wsUrl = `ws://localhost:${wsport}/ws`;
+
   const homePage = await fs.readFile(path.resolve(__dirname, 'paintBoard.html'))
-    .then((data) => data.toString().replace('$wsurl', `ws://localhost:${wsport}`));
+    .then((data) => data.toString()
+      .replaceAll('$wsUrl', wsUrl)
+      .replaceAll('$width', width)
+      .replaceAll('$height', height)
+      .replaceAll('$5width', 5 * width)
+      .replaceAll('$5height', 5 * height)
+      .replaceAll('$cd', cd));
 
   const wss = await new Promise((resolve, reject) => {
     const wsServer = new WebSocket.Server({ port: wsport, path: '/ws' });
@@ -163,6 +171,11 @@ async function createServer({
     post('/paintBoard/paint', paint),
     get(() => status(404).send('Not Found')),
   ]);
+
+  return {
+    homePageUrl: `http://localhost:${port}/paintBoard`,
+    wsUrl,
+  };
 }
 
 module.exports = { createServer };
