@@ -18,6 +18,7 @@
 const fs = require('fs').promises;
 const { inRange } = require('lodash');
 const path = require('path');
+const async = require('async');
 const WebSocket = require('ws');
 const server = require('server');
 const json = require('server/reply/json');
@@ -114,7 +115,25 @@ async function createServer({
     return result;
   }
 
-  function paint(ctx) {
+  const paintQueue = async.queue(async ({
+    x, y, color, log,
+  }) => {
+    board[x][y] = color;
+    const broadcast = JSON.stringify({
+      type: 'paintboard_update',
+      x,
+      y,
+      color,
+    });
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(broadcast);
+      }
+    });
+    log.info(`WebSocket broadcast: ${broadcast}`);
+  });
+
+  async function paint(ctx) {
     function response(statusCode, message) {
       ctx.log.info(`${statusCode}: ${message}`);
       return json({ status: statusCode, data: message });
@@ -143,23 +162,11 @@ async function createServer({
     const color = +ctx.data?.color;
 
     if (inRange(x, 0, width) && inRange(y, 0, height) && inRange(color, 0, COLOR.length)) {
-      try {
-        lastPaint.set(uid, Date.now());
-        board[x][y] = color;
-        return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
-      } finally {
-        const broadcast = JSON.stringify({
-          type: 'paintboard_update',
-          x,
-          y,
-          color,
-        });
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(broadcast);
-          }
-        });
-      }
+      lastPaint.set(uid, Date.now());
+      await paintQueue.push({
+        x, y, color, log: ctx.log,
+      });
+      return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
     }
 
     return response(400, 'data 中的 x, y, color 不合法');
