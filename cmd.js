@@ -37,7 +37,7 @@ Options:
   --noRestrict       Don't require cookies and referer and no CD time.
                      [env: NORESTRICT]
 
-  --cd=<cd>          Inteval between two paints of the same uid, in milliseconds.
+  --cd=<cd>          Interval between two paints of the same uid, in milliseconds.
                      [env: CD] [default: 10000]
 
   --height=<height>  The height of the board. [env: HEIGHT] [default: 400]
