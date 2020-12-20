@@ -72,7 +72,7 @@ async function createServer({
   width = 800,
   height = 400,
   verbose = false,
-}) {
+} = {}) {
   const board = new Array(width).fill(0).map(() => new Array(height).fill(DEFAULT_COLOR));
   const lastPaint = new Map();
 
