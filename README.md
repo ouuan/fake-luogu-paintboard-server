@@ -44,7 +44,7 @@ URL: `http://localhost:<port>`
 
 要求：
 
-1.  传入一个带 `_uid` 和 `__client_id` 的 Cookie；
+1.  传入一个带 `_uid` 和 `__client_id` 的 Cookie（不需要是真实的 uid 和 client_id，uid 用于计算冷却时间，client_id 没有实际意义）；
 2.  Referer 为 `Referer: https://www.luogu.com.cn/paintBoard`；
 3.  data 为：`{x:<columnIndex>,y:<rowIndex>,color:<colorIndex>}`，表示在第 `x + 1` 列第 `y + 1` 行的像素画编号为 `color` 的颜色。
 
