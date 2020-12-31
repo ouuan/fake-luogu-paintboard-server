@@ -64,13 +64,15 @@ const COLOR = [
 const DEFAULT_COLOR = 2;
 const REQUIRED_REFERER = 'https://www.luogu.com.cn/paintBoard';
 
+const constants = require('./constants');
+
 async function createServer({
-  port = 3000,
-  wsport = 4000,
+  port = constants.port,
+  wsport = constants.wsport,
   noRestrict = false,
-  cd = 10000,
-  width = 800,
-  height = 400,
+  cd = constants.cd,
+  width = constants.width,
+  height = constants.height,
   verbose = false,
 } = {}) {
   const board = new Array(width).fill(0).map(() => new Array(height).fill(DEFAULT_COLOR));

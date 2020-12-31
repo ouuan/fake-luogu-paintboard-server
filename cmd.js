@@ -20,6 +20,7 @@
 const neodoc = require('neodoc');
 
 const { createServer } = require('./lib');
+const constants = require('./constants');
 const { version: VERSION } = require('./package.json');
 
 const args = neodoc.run(`Run a fake Luogu paintboard server.
@@ -29,20 +30,20 @@ Usage:
   
 Options:
   --port=<port>      The port of the HTTP server on localhost.
-                     [env: PORT] [default: 3000]
+                     [env: PORT] [default: ${constants.port}]
   
   --wsport=<wsport>  The port of the WebSocket server on localhost.
-                     [env: WSPORT] [default: 4000]
+                     [env: WSPORT] [default: ${constants.wsport}]
 
   --noRestrict       Don't require cookies and referer and no CD time.
                      [env: NORESTRICT]
 
   --cd=<cd>          Interval between two paints of the same uid, in milliseconds.
-                     [env: CD] [default: 10000]
+                     [env: CD] [default: ${constants.cd}]
 
-  --height=<height>  The height of the board. [env: HEIGHT] [default: 400]
+  --height=<height>  The height of the board. [env: HEIGHT] [default: ${constants.height}]
 
-  --width=<width>    The width of the board.  [env: WIDTH]  [default: 800]
+  --width=<width>    The width of the board.  [env: WIDTH]  [default: ${constants.width}]
 
   --verbose          Be more verbose.         [env: VERBOSE]
 `, { version: `v${VERSION}` });
