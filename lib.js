@@ -80,12 +80,12 @@ async function createServer({
 
   const homePage = await fs.readFile(path.resolve(__dirname, 'paintBoard.html'))
     .then((data) => data.toString()
-      .replace(new RegExp(/(\$wsUrl)/g), wsUrl)
-      .replace(new RegExp(/(\$width)/g), width)
-      .replace(new RegExp(/(\$height)/g), height)
-      .replace(new RegExp(/(\$5width)/g), 5 * width)
-      .replace(new RegExp(/(\$5height)/g), 5 * height)
-      .replace(new RegExp(/(\$cd)/g), cd));
+      .replace(/\$wsUrl/g, wsUrl)
+      .replace(/\$width/g, width)
+      .replace(/\$height/g, height)
+      .replace(/\$5width/g, 5 * width)
+      .replace(/\$5height/g, 5 * height)
+      .replace(/\$cd/g, cd));
 
   const wss = await new Promise((resolve, reject) => {
     const wsServer = new WebSocket.Server({ port: wsport, path: '/ws' });
