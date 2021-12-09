@@ -159,16 +159,18 @@ async function createServer({
       }
     }
 
-    const x = +ctx.data?.x;
-    const y = +ctx.data?.y;
-    const color = +ctx.data?.color;
+    if (ctx.data) {
+      const x = +ctx.data.x;
+      const y = +ctx.data.y;
+      const color = +ctx.data.color;
 
-    if (inRange(x, 0, width) && inRange(y, 0, height) && inRange(color, 0, COLOR.length)) {
-      lastPaint.set(uid, Date.now());
-      await paintQueue.push({
-        x, y, color, log: ctx.log,
-      });
-      return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
+      if (inRange(x, 0, width) && inRange(y, 0, height) && inRange(color, 0, COLOR.length)) {
+        lastPaint.set(uid, Date.now());
+        await paintQueue.push({
+          x, y, color, log: ctx.log,
+        });
+        return response(200, `成功（uid:${uid}, x:${x}, y:${y}, color:${color}）`);
+      }
     }
 
     return response(400, 'data 中的 x, y, color 不合法');
